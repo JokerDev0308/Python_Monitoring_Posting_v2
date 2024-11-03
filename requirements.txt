@@ -1,0 +1,6 @@
+pandas
+openpyxl
+PyQt5
+requests
+beautifulsoup4
+tweepy

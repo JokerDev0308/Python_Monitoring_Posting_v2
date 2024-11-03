@@ -1,0 +1,7 @@
+.git
+.github
+.gitlab
+build
+dist
+__pycache__
+main.spec
