@@ -1,12 +1,13 @@
 import requests
 from PyQt5.QtWidgets import (
-    QWidget, QLabel, QVBoxLayout, QPushButton,
+    QWidget, QLabel, QVBoxLayout, QPushButton, QTimeEdit,
     QHBoxLayout, QTextEdit, QProgressBar,QCheckBox
 )
 from PyQt5.QtGui import QPixmap
 from monitor_thread import MonitorThread
 from utils import load_product_list, is_within_notification_time
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt , QTime
+from datetime import datetime
 
 class ProductMonitorApp(QWidget):
     def __init__(self):
@@ -25,6 +26,22 @@ class ProductMonitorApp(QWidget):
         
         self.results_display = QTextEdit()
         self.results_display.setReadOnly(True)
+
+        self.start_time = QTimeEdit()
+        self.end_time = QTimeEdit()
+
+        # Set default times
+        self.start_time.setTime(QTime(0, 0))  # Default start time
+        self.end_time.setTime(QTime(23, 59))  # Default end time
+
+        # Set ranges
+        self.start_time.setMinimumTime(QTime(0, 0))  # Minimum start time
+        self.start_time.setMaximumTime(QTime(23, 58))  # Maximum start time (less than end time)
+        self.end_time.setMinimumTime(QTime(0, 1))  # Minimum end time (greater than start time)
+        self.end_time.setMaximumTime(QTime(23, 59))  # Maximum end time
+
+        self.start_time_label = QLabel("勤務時間: ")
+        self.end_time_label = QLabel(" ~ ")
 
         self.start_button = QPushButton("開始")  # Start
         self.stop_button = QPushButton("停止")  # Stop
@@ -45,6 +62,13 @@ class ProductMonitorApp(QWidget):
         text_layout.addWidget(self.price_label)
         text_layout.addWidget(self.stock_status_label)
 
+        time_layout = QHBoxLayout()
+        time_layout.addWidget(self.start_time_label)
+        time_layout.addWidget(self.start_time)
+        time_layout.addWidget(self.end_time_label)
+        time_layout.addWidget(self.end_time)
+
+
         product_layout = QVBoxLayout()
         product_layout.addWidget(self.image_display)
         product_layout.addLayout(text_layout)
@@ -53,8 +77,12 @@ class ProductMonitorApp(QWidget):
         body_layout.addLayout(product_layout)
         body_layout.addWidget(self.results_display)
 
+        self.sapce = QLabel()
+
         button_layout = QHBoxLayout()
         button_layout.addWidget(self.repeat_checkbox)
+        button_layout.addLayout(time_layout)
+        button_layout.addWidget(self.sapce)
         button_layout.addWidget(self.posting_X_checkbox)
         button_layout.addWidget(self.start_button)
         button_layout.addWidget(self.stop_button)
@@ -71,12 +99,30 @@ class ProductMonitorApp(QWidget):
         self.start_button.clicked.connect(self.start_monitoring)
         self.stop_button.clicked.connect(self.stop_monitoring)
 
+        # Connect time change signals
+        self.start_time.timeChanged.connect(self.validate_times)
+        self.end_time.timeChanged.connect(self.validate_times)
+
         self.products = load_product_list()
         self.monitor_thread = None
 
+        self.validate_times()
+    
+    def validate_times(self):
+        start_time_value = self.start_time.time()
+        end_time_value = self.end_time.time()
+
+        # Ensure the end time is greater than the start time
+        if start_time_value >= end_time_value:
+            self.end_time.setEnabled(False)  # Disable end time if invalid
+            self.results_display.append("終了時間は開始時間より後でなければなりません。")  # End time must be after start time
+        else:
+            self.end_time.setEnabled(True)  # Enable end time if valid
+
     def start_monitoring(self):
-        if is_within_notification_time():
-            self.results_display.clear()
+        # if is_within_notification_time():
+        if self.start_time.time() <= datetime.now().time() <= self.end_time.time():
+            # self.results_display.clear()
             self.progress.setValue(0)
             self.monitor_thread = MonitorThread(self.products, self.posting_X_checkbox.isChecked())
             
