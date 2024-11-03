@@ -86,3 +86,80 @@ pip install PyQt5 pandas requests beautifulsoup4 openpyxl
 
 ### カスタマイズ
 プロジェクトの具体的な内容に合わせて、必要に応じて内容を変更してください！
+
+
+Here’s a detailed usage section for the built application, which you can include in your `README.md`:
+
+```markdown
+## 使用方法
+
+このアプリケーションを使用するための手順は以下の通りです。
+
+### 1. 環境の準備
+
+- Python 3.x がインストールされていることを確認してください。
+- 必要なライブラリをインストールします。
+
+```bash
+pip install PyQt5 pandas requests beautifulsoup4 openpyxl
+```
+
+### 2. 設定ファイルの準備
+
+- プロジェクトのルートディレクトリに `settings.json` ファイルを作成します。
+- 以下のような内容で設定します。
+
+```json
+{
+    "notification_start_time": "09:00",
+    "notification_end_time": "21:00"
+}
+```
+
+### 3. 商品リストの作成
+
+- `product_list.xlsx` という名前のExcelファイルを作成します。
+- 次の2つのシートを追加します：
+
+#### a. product_list シート
+
+このシートには監視したい商品の情報を入力します。列の例：
+
+| product_name                 | product_url                      | affiliate_link             | title               | description         | start_price | end_price |
+|------------------------------|----------------------------------|----------------------------|---------------------|---------------------|-------------|-----------|
+| iPhone16 無印 256 (ティール)  | https://example.com/product1     | https://affiliate.com/1    | new popular product | iPhone description  | 100000      | 120000    |
+
+#### b. settings シート
+
+このシートには、通知に関する設定を入力します。例：
+
+| notification_start_time | notification_end_time |
+|-------------------------|-----------------------|
+| 09:00                   | 21:00                 |
+
+### 4. アプリケーションの実行
+
+以下のコマンドを使用してアプリケーションを起動します。
+
+```bash
+python monitor_thread.py
+```
+
+### 5. アプリケーションの操作
+
+- アプリケーションが起動すると、GUIが表示されます。
+- 商品リストが読み込まれ、在庫状況と価格が監視されます。
+- 在庫がある場合、指定した条件に基づいてSNSに投稿されます。
+
+### 6. ログの確認
+
+- 監視中にエラーが発生した場合は、`post_log.txt` ファイルに記録されます。このファイルをチェックして、問題を確認できます。
+
+### 7. アプリケーションの終了
+
+- 監視を停止するには、アプリケーションのウィンドウを閉じてください。
+
+この手順に従うことで、商品監視と投稿機能を利用できるようになります。
+```
+
+Feel free to modify any part of the text to better fit your project's specific details!
